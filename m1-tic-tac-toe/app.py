@@ -15,19 +15,15 @@ def display_board(board):
     print(' ' + board[0] + ' | ' + board[1] + ' | ' + board[2])
 
 def player_input():
-    ''' Accept a player's marker '''
+    ''' Determine the players' markers '''
 
     marker = ''
     while marker != 'X' and marker != 'O':
-        marker = raw_input("Enter player marker: ")
-    return marker
-
-def other_marker(marker):
-    """ Determine the marker for the second player """
+        marker = raw_input("Player 1 would you like to play with X or O: (X/O)")
     if marker == 'X':
-        return 'O'
+        return ['X', 'O']
     else:
-        return 'X'
+        return ['O', 'X']
 
 def place_marker(board, marker, position):
     ''' Place a marker on the specified position
@@ -70,27 +66,24 @@ def choose_first():
 
 def space_check(board, position):
     """ Check whether a space on the board is freely available """
-    return board[position] != 'X' and board[position] != 'Y'
+    return board[position] != 'X' and board[position] != 'O'
 
 def full_board_check(board):
     """ Check if the board is full """
     for pos in range(0, 9):
         if space_check(board, pos):
+#            print("full_board_check: position " + str(pos) + " is available")
             return False
     return True
 
 def read_valid_position(player):
     """ Read valid position """
-    position = -1
-    while not 0 <= position < 9:
+    str_position = ''
+    while str_position not in '0 1 2 3 4 5 6 7 8'.split():
         str_position = raw_input("Player "+ str(player + 1) + " enter next position[0-8]: ")
         str_position = str_position.strip()
-        if len(str_position) != 1:
-            continue
-        if not str_position.isdigit():
-            continue
-        position = int(str_position)
-    return position
+
+    return int(str_position)
 
 def player_choice(player, board):
     """ Ask for a player's next position """
@@ -115,27 +108,24 @@ def tictactoe():
     print('Welcome to Tic Tac Toe!')
     while True:
 
-        markers = {}
-        markers[0] = player_input()
-        markers[1] = other_marker(markers[0])
+        markers = player_input()
         print("Player 1: " + markers[0] + " Player 2: " + markers[1])
 
-        move = 0
         current_player = choose_first()
         game_board = [' '] * 9
         display_board(game_board)
-        while not full_board_check(game_board):
+        while True:
             position = player_choice(current_player, game_board)
             place_marker(game_board, markers[current_player], position)
             display_board(game_board)
             if win_check(game_board, markers[current_player]):
                 print("Player " + str(current_player + 1) + " wins!")
-                print("GAME OVER")
                 break
+            elif full_board_check(game_board):
+                print("The game is a draw!")
+                break
+
             current_player = (current_player + 1) % 2
-            move += 1
-        else:
-            print("GAME OVER")
 
         if not replay():
             break
